@@ -4,6 +4,7 @@ Python library for interacting with STRINGdb of protein-protein interaction netw
 @jonathanronen 9/2015
 """
 
+import json
 import logging
 import requests
 import pandas as pd
@@ -117,4 +118,11 @@ def get_interactions_image(identifier, flavor, filename, required_score=950,
             outfile.write(chunk)
 
 def resolve(identifier, *args):
+    """
+    Search the database for proteins with the name in `identifier`.
+    Allows us to later resolve the names which are ambiguous.
+    """
     resp = do_request('resolve', 'json', {'identifier': identifier}, *args)
+    if not resp.status_code == 200:
+        raise Exception(resp)
+    return json.loads(resp.text)

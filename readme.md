@@ -12,11 +12,13 @@ pip install pystringdb-client
 ```
 
 #### Use
-We'll see...
-
 ```python
 from pystringdb_client import stringdb
-results = stringdb.query()
+```
+
+##### Resolve protein names to unique identifiers
+```python
+matches = stringdb.resolve('ALK')
 ```
 
 #### Python requirements
