@@ -25,6 +25,7 @@ Tested on Python **2.7.10** and **3.5.0**.
 #### Dependencies
   - pandas
   - requests
+  - six
 
 #### Contributing
 Feel free to report bugs, request features, or send pull requests!

@@ -8,7 +8,7 @@ import logging
 import requests
 import pandas as pd
 import xml.etree.cElementTree as et
-from StringIO import StringIO
+from six import StringIO
 
 logger = logging.getLogger(__name__)
 
