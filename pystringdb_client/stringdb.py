@@ -64,13 +64,14 @@ def do_request(request, req_format, params, https=False, database='string-db.org
     else:
         raise Exception(resp)
 
-def get_interactions(identifiers, q_format='psi-mi', https=False, database='string-db.org'):
+def get_interactions(identifier, species=None, required_score=400, limit=20, q_format='psi-mi', *args):
     """
     Query DB for interaction network in PSI-MI 2.5 format or PSI-MI-TAB format (similar to tsv).
-    `identifiers` must be a list
+    `identifier` is the protein name
     `format` may be 'psi-mi' or 'psi-mi-tab'
     If 'psi-mi', the response is returned in PSI-MI 2.5 XML format. This method will return
     an xml ElementTree object
+    `species` may be specified (e.g. Human 9606, see: http://www.uniprot.org/taxonomy)
 
     Example:
     ########
@@ -88,8 +89,9 @@ def get_interactions(identifiers, q_format='psi-mi', https=False, database='stri
     """
     if q_format not in {'psi-mi', 'psi-mi-tab'}:
         raise Exception("format has to be one of ('psi-mi', 'psi-mi-tab'). {} is invalid.".format(q_format))
-    resp = do_request('interactionsList', q_format, 
-        {'identifiers': identifiers}, https=https, database=database)
+    resp = do_request('interactions', q_format,
+        {'identifier': identifier, 'required_score': required_score, 'limit': limit, 'species': species},
+        https=https, database=database)
     if q_format == 'psi-mi':
         return et.fromstring(resp.text)
     elif q_format == 'psi-mi-tab':
@@ -97,7 +99,7 @@ def get_interactions(identifiers, q_format='psi-mi', https=False, database='stri
         return pd.read_csv(sio, delimiter='\t', header=None, names=PSIMITAB_COLUMNS)
 
 def get_interactions_image(identifier, flavor, filename, required_score=950,
-    limit=50, https=False, database='string-db.org'):
+    limit=50, *args):
     """
     Save network image of interactions to file.
     `identifiers` is the protein name
@@ -116,4 +118,5 @@ def get_interactions_image(identifier, flavor, filename, required_score=950,
         for chunk in r:
             outfile.write(chunk)
 
-
+def resolve(identifier, *args):
+    pass
