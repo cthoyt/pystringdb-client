@@ -18,7 +18,7 @@ from pystringdb_client import stringdb
 
 ##### Resolve protein names to unique identifiers
 ```python
-matches = stringdb.resolve('ALK')
+matches = stringdb.resolve('ALK', species=9606)
 ```
 
 #### Python requirements
