@@ -108,7 +108,6 @@ def get_interactions_image(identifier, flavor, filename, required_score=950,
         'confidence' for singled lines where hue correspond to confidence score
         'actions' for stitch only.
     `filename` is the file to save the png to.
-
     """
 
     r = do_request('network', 'image',
@@ -117,12 +116,12 @@ def get_interactions_image(identifier, flavor, filename, required_score=950,
         for chunk in r:
             outfile.write(chunk)
 
-def resolve(identifier, *args):
+def resolve(identifier, species=None, *args):
     """
     Search the database for proteins with the name in `identifier`.
     Allows us to later resolve the names which are ambiguous.
     """
-    resp = do_request('resolve', 'json', {'identifier': identifier}, *args)
+    resp = do_request('resolve', 'json', {'identifier': identifier, 'species': species}, *args)
     if not resp.status_code == 200:
         raise Exception(resp)
     return json.loads(resp.text)
