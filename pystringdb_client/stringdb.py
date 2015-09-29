@@ -90,8 +90,7 @@ def get_interactions(identifier, species=None, required_score=400, limit=20, q_f
     if q_format not in {'psi-mi', 'psi-mi-tab'}:
         raise Exception("format has to be one of ('psi-mi', 'psi-mi-tab'). {} is invalid.".format(q_format))
     resp = do_request('interactions', q_format,
-        {'identifier': identifier, 'required_score': required_score, 'limit': limit, 'species': species},
-        https=https, database=database)
+        {'identifier': identifier, 'required_score': required_score, 'limit': limit, 'species': species}, *args)
     if q_format == 'psi-mi':
         return et.fromstring(resp.text)
     elif q_format == 'psi-mi-tab':
@@ -112,11 +111,10 @@ def get_interactions_image(identifier, flavor, filename, required_score=950,
     """
 
     r = do_request('network', 'image',
-        {'identifier': identifier, 'required_score': required_score, 'limit': limit},
-        https=https, database=database)
+        {'identifier': identifier, 'required_score': required_score, 'limit': limit}, *args)
     with open(filename, 'wb') as outfile:
         for chunk in r:
             outfile.write(chunk)
 
 def resolve(identifier, *args):
-    pass
+    resp = do_request('resolve', 'json', {'identifier': identifier}, *args)
