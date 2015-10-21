@@ -4,12 +4,13 @@ Python library for interacting with STRINGdb of protein-protein interaction netw
 @jonathanronen 9/2015
 """
 
+import csv
 import json
 import logging
 import requests
 import pandas as pd
 import xml.etree.cElementTree as et
-from six import StringIO
+from six import StringIO, string_types
 
 logger = logging.getLogger(__name__)
 
@@ -116,12 +117,22 @@ def get_interactions_image(identifier, flavor, filename, required_score=950,
         for chunk in r:
             outfile.write(chunk)
 
-def resolve(identifier, species=None, *args):
+def resolve(identifier, species=None, *args, **kwargs):
     """
     Search the database for proteins with the name in `identifier`.
     Allows us to later resolve the names which are ambiguous.
     """
-    resp = do_request('resolve', 'json', {'identifier': identifier, 'species': species}, *args)
+    req_format = kwargs.pop('req_format', 'json')
+
+    request_name = 'resolve' if isinstance(identifier, string_types) else 'resolveList'
+    id_param_name = 'identifier' if isinstance(identifier, string_types) else 'identifiers'
+    identifier = identifier if isinstance(identifier, string_types) else '\n'.join(identifier)
+
+    resp = do_request(request_name, req_format, {id_param_name: identifier, 'species': species}, *args, **kwargs)
     if not resp.status_code == 200:
         raise Exception(resp)
-    return json.loads(resp.text)
+    try:
+        return json.loads(resp.text)
+    except:
+        sio = StringIO(resp.text)
+        return list(csv.reader(sio, delimiter='\t'))
