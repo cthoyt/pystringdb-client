@@ -9,17 +9,18 @@ Python library for interacting with STRINGdb of protein-protein interaction netw
 import csv
 import json
 import logging
-import requests
-import pandas as pd
 import xml.etree.cElementTree as et
+
+import pandas as pd
+import requests
 from six import StringIO, string_types
 
 logger = logging.getLogger(__name__)
 
 STRINGDB_ADDRESSES = [
-    ("string-db.org",   "Main entry point of STRING"),
-    ("string.embl.de",  "Alternative entry point of STRING"),
-    ("stitch.embl.de",  "The sister database of STRING"),
+    ("string-db.org", "Main entry point of STRING"),
+    ("string.embl.de", "Alternative entry point of STRING"),
+    ("stitch.embl.de", "The sister database of STRING"),
 ]
 
 STRINGDB_FORMATS = {
