@@ -70,27 +70,26 @@ def do_request(request, req_format, params, https=False, database='string-db.org
         raise Exception(resp)
 
 def get_interactions(identifier, species=None, required_score=400, limit=20, q_format='psi-mi', *args):
-    """
-    Query DB for interaction network in PSI-MI 2.5 format or PSI-MI-TAB format (similar to tsv).
-    `identifier` is the protein name
-    `format` may be 'psi-mi' or 'psi-mi-tab'
-    If 'psi-mi', the response is returned in PSI-MI 2.5 XML format. This method will return
-    an xml ElementTree object
-    `species` may be specified (e.g. Human 9606, see: http://www.uniprot.org/taxonomy)
+    """Query DB for interaction network in PSI-MI 2.5 format or PSI-MI-TAB format (similar to tsv).
+
+    :param identifier: The protein name
+    :param Optional[str] species: may be specified (e.g. Human 9606, see: http://www.uniprot.org/taxonomy)
+    :param str q_format: one of 'psi-mi' or 'psi-mi-tab'
+    :return: If 'psi-mi', the response is returned in PSI-MI 2.5 XML format. This method will return an xml ElementTree
+             object
 
     Example:
-    ########
-    results = stringdb.get_interaftions(['ALK'], format='psi-mi')
 
-    If `format='psi-mi-tab'` results are returned in Tab-delimited form of PSI-MI
-    (similar to tsv, modeled after the IntAct specification,
-        Contains less info than XML response.)
-    This method will return a pandas.DataFrame object.
+    >>> from pystringdb_client import stringdb
+    >>> results = stringdb.get_interactions(['ALK'], q_format='psi-mi')
+
+    If ``format='psi-mi-tab'`` results are returned in Tab-delimited form of PSI-MI (similar to tsv, modeled after the
+    IntAct specification, Contains less info than XML response.) This method will return a pandas.DataFrame object.
 
     Example:
-    ########
-    results = stringdb.get_interaftions(['ALK'], format='psi-mi-tab')
-    results.to_csv('outfile.tsv', delimiter='\t', index=False)
+
+    >>> results = stringdb.get_interactions(['ALK'], q_format='psi-mi-tab')
+    >>> results.to_csv('outfile.tsv', delimiter='\t', index=False)
     """
     if q_format not in {'psi-mi', 'psi-mi-tab'}:
         raise Exception("format has to be one of ('psi-mi', 'psi-mi-tab'). {} is invalid.".format(q_format))
@@ -102,28 +101,24 @@ def get_interactions(identifier, species=None, required_score=400, limit=20, q_f
         sio = StringIO(resp.text)
         return pd.read_csv(sio, delimiter='\t', header=None, names=PSIMITAB_COLUMNS)
 
-def get_interactions_image(identifier, flavor, filename, required_score=950,
-    limit=50, *args):
-    """
-    Save network image of interactions to file.
-    `identifiers` is the protein name
-    `flavor` is one of:
-        'evidence' for colored multilines
-        'confidence' for singled lines where hue correspond to confidence score
-        'actions' for stitch only.
-    `filename` is the file to save the png to.
-    """
 
-    r = do_request('network', 'image',
-        {'identifier': identifier, 'required_score': required_score, 'limit': limit}, *args)
+def get_interactions_image(identifier, flavor, filename, required_score=950, limit=50, *args):
+    """Save network image of interactions to file.
+
+    :param str identifier: the protein name
+    :param str flavor: one of 'evidence' for colored multilines, 'confidence' for singled lines where hue correspond to
+                       confidence score, or 'actions' for stitch only.
+    :param filename: the file to save the png to.
+    """
+    r = do_request('network', 'image', {'identifier': identifier, 'required_score': required_score, 'limit': limit},
+                   *args)
     with open(filename, 'wb') as outfile:
         for chunk in r:
             outfile.write(chunk)
 
 def resolve(identifier, species=None, *args, **kwargs):
-    """
-    Search the database for proteins with the name in `identifier`.
-    Allows us to later resolve the names which are ambiguous.
+    """Search the database for proteins with the name in `identifier`. Allows us to later resolve the names which are
+    ambiguous.
     """
     req_format = kwargs.pop('req_format', 'json')
 
