@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 Python library for interacting with STRINGdb of protein-protein interaction networks.
 
