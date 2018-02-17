@@ -52,15 +52,15 @@ PSIMITAB_COLUMNS = [
 
 STRINGDB_REQUEST_TEMPLATE = "{http}://{address}/api/{format}/{request}"
 
+
 def do_request(request, req_format, params, https=False, database='string-db.org'):
-    """
-    Send actual HTTP request to API.
-    """
+    """Send actual HTTP request to API."""
     url = STRINGDB_REQUEST_TEMPLATE.format(
         http='https' if https else 'http',
         address=database,
         format=req_format,
-        request=request)
+        request=request
+    )
     resp = requests.get(url, params=params)
     logger.debug('Requested {}'.format(resp.url))
 
@@ -68,6 +68,7 @@ def do_request(request, req_format, params, https=False, database='string-db.org
         return resp
     else:
         raise Exception(resp)
+
 
 def get_interactions(identifier, species=None, required_score=400, limit=20, q_format='psi-mi', *args):
     """Query DB for interaction network in PSI-MI 2.5 format or PSI-MI-TAB format (similar to tsv).
@@ -92,9 +93,17 @@ def get_interactions(identifier, species=None, required_score=400, limit=20, q_f
     >>> results.to_csv('outfile.tsv', delimiter='\t', index=False)
     """
     if q_format not in {'psi-mi', 'psi-mi-tab'}:
-        raise Exception("format has to be one of ('psi-mi', 'psi-mi-tab'). {} is invalid.".format(q_format))
-    resp = do_request('interactions', q_format,
-        {'identifier': identifier, 'required_score': required_score, 'limit': limit, 'species': species}, *args)
+        raise ValueError("format has to be one of ('psi-mi', 'psi-mi-tab'). {} is invalid.".format(q_format))
+
+    params = {
+        'identifier': identifier,
+        'required_score': required_score,
+        'limit': limit,
+        'species': species
+    }
+
+    resp = do_request('interactions', req_format=q_format, params=params, *args)
+
     if q_format == 'psi-mi':
         return et.fromstring(resp.text)
     elif q_format == 'psi-mi-tab':
@@ -115,6 +124,7 @@ def get_interactions_image(identifier, flavor, filename, required_score=950, lim
     with open(filename, 'wb') as outfile:
         for chunk in r:
             outfile.write(chunk)
+
 
 def resolve(identifier, species=None, *args, **kwargs):
     """Search the database for proteins with the name in `identifier`. Allows us to later resolve the names which are
